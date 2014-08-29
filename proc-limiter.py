@@ -12,16 +12,24 @@ import sh
 
 DB_NAME = 'proc-limiter'
 
+
 def get_file_name(cmd):
     hash = hashlib.sha256(cmd).hexdigest()
     return hash
+
+
+def count_descriptors(path):
+    res = sh.lsof('-F', 'p', path).strip()
+    res = res.split("\n")
+    return len(res)
 
 @click.command()
 @click.option('--limit', type=int, default=1, help='Max number of processes')
 @click.option('--command', type=str, help='Command to execute')
 @click.option('--timeout', type=int, default=0, help='Timeout for single process')
 @click.option('--no-shell', type=bool, default=False, help='Run command through shell')
-def cli(command, limit=1, timeout=0, no_shell=False):
+@click.option('--exit-code', type=int, default=1, help='Exit code on exceeded limit')
+def cli(command, limit=1, timeout=0, no_shell=False, exit_code=1):
     lock_file_name = get_file_name(str(command).encode())
 
     path = pathlib.Path(tempfile.gettempdir()) / DB_NAME
@@ -32,12 +40,12 @@ def cli(command, limit=1, timeout=0, no_shell=False):
     if no_shell:
         command = shlex.split(command)
 
-
     with open(str(lock_file_path), 'a+') as fh:
-        print('command', command)
-        print('path', lock_file_path)
-        print('lsof', sh.lsof(str(lock_file_path).encode()))
-        sys.exit()
+        cnt = count_descriptors(str(lock_file_path))
+        
+        if cnt >= limit:
+            print('Limit of processes is exceeded, exiting', file=sys.stderr)
+            sys.exit(exit_code)
 
         proc = subprocess.Popen(command, shell=True)
         proc.wait(None if timeout <= 0 else timeout)
