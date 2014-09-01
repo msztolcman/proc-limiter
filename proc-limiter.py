@@ -8,7 +8,6 @@ import subprocess
 import tempfile
 import sys
 
-# import click
 import sh
 
 DB_NAME = 'proc-limiter'
@@ -26,7 +25,6 @@ def count_descriptors(path):
 
 
 def cli(args):
-    # command, limit = 1, timeout = 0, no_shell = False, exit_code = 1 =
     lock_file_name = get_file_name(str(args.command).encode())
 
     path = pathlib.Path(tempfile.gettempdir()) / DB_NAME
