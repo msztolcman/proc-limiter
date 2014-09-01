@@ -8,7 +8,6 @@ import subprocess
 import tempfile
 import sys
 
-import sh
 
 DB_NAME = 'proc-limiter'
 
@@ -19,9 +18,21 @@ def get_file_name(cmd):
 
 
 def count_descriptors(path):
-    res = sh.lsof('-F', 'p', path).strip()
-    res = res.split("\n")
-    return len(res)
+    command = ['lsof', '-F', 'p', path]
+    res = subprocess.Popen(command, stderr=subprocess.PIPE, stdout=subprocess.PIPE)
+    res.wait()
+
+    if res.returncode == 0:
+        stdout = res.stdout.read().decode().strip()
+        stdout = stdout.split("\n")
+        return len(stdout)
+
+    stderr = res.stderr.read().decode().strip()
+    if stderr:
+        print("lsof exit code is %d. Error:\n%s" % (res.returncode, stderr), file=sys.stderr)
+        sys.exit(1)
+
+    return 0
 
 
 def cli(args):
