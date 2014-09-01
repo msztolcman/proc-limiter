@@ -54,14 +54,14 @@ def main():
     p = argparse.ArgumentParser()
     p.add_argument('--limit', '-l', type=int, default=1, help='Max number of processes')
     p.add_argument('--command', '-c', type=str, help='Command to execute')
-    p.add_argument('--timeout', '-t', type=int, default=0, help='Timeout for single process')
+    # p.add_argument('--timeout', '-t', type=int, default=0, help='Timeout for single process')
     p.add_argument('--no-shell', type=bool, default=False, help='Run command through shell')
     p.add_argument('--exit-code', type=int, default=1, help='Exit code on exceeded limit')
 
     args = p.parse_args()
 
-    if args.timeout <= 0:
-        args.timeout = None
+    # if args.timeout <= 0:
+    #     args.timeout = None
 
     return cli(args)
 
