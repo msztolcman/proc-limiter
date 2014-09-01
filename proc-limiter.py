@@ -54,7 +54,7 @@ def cli(args):
             print('Limit of processes is exceeded, exiting', file=sys.stderr)
             sys.exit(args.exit_code)
 
-        proc = subprocess.Popen(command, shell=True)
+        proc = subprocess.Popen(command, shell=not args.no_shell)
         # proc.wait(timeout=args.timeout)
         proc.wait()
 
@@ -66,7 +66,7 @@ def main():
     p.add_argument('--limit', '-l', type=int, default=1, help='Max number of processes')
     p.add_argument('--command', '-c', type=str, help='Command to execute')
     # p.add_argument('--timeout', '-t', type=int, default=0, help='Timeout for single process')
-    p.add_argument('--no-shell', type=bool, default=False, help='Run command through shell')
+    p.add_argument('--no-shell', default=False, action='store_true', help='Run command through shell')
     p.add_argument('--exit-code', type=int, default=1, help='Exit code on exceeded limit')
 
     args = p.parse_args()
