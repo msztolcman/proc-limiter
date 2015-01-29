@@ -25,17 +25,15 @@ def count_descriptors(path):
     res = subprocess.Popen(command, stderr=subprocess.PIPE, stdout=subprocess.PIPE)
     res.wait()
 
-    if res.returncode == 0:
-        stdout = res.stdout.read().decode().strip()
-        stdout = stdout.split("\n")
-        return len(stdout)
+    if res.returncode != 0:
+        stderr = res.stderr.read().decode().strip()
+        if stderr:
+            print("lsof exit code is %d. Error:\n%s" % (res.returncode, stderr), file=sys.stderr)
+            sys.exit(1)
 
-    stderr = res.stderr.read().decode().strip()
-    if stderr:
-        print("lsof exit code is %d. Error:\n%s" % (res.returncode, stderr), file=sys.stderr)
-        sys.exit(1)
-
-    return 0
+    stdout = res.stdout.read().decode().strip()
+    stdout = stdout.split("\n")
+    return len(stdout)
 
 
 def parse_args(args):
