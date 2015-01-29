@@ -38,7 +38,24 @@ def count_descriptors(path):
     return 0
 
 
-def cli(args):
+def parse_args(args):
+    p = argparse.ArgumentParser()
+    p.add_argument('--limit', '-l', type=int, default=1, help='Max number of processes')
+    p.add_argument('--command', '-c', type=str, help='Command to execute')
+    # p.add_argument('--timeout', '-t', type=int, default=0, help='Timeout for single process')
+    p.add_argument('--no-shell', default=False, action='store_true', help='Run command through shell')
+    p.add_argument('--exit-code', type=int, default=1, help='Exit code on exceeded limit')
+
+    args = p.parse_args(args)
+    return args
+
+
+def main():
+    args = parse_args(sys.argv[1:])
+
+    # if args.timeout <= 0:
+    #     args.timeout = None
+
     lock_file_name = get_file_name(str(args.command).encode())
 
     path = pathlib.Path(tempfile.gettempdir()) / DB_NAME
@@ -63,21 +80,6 @@ def cli(args):
 
     sys.exit(proc.returncode)
 
-
-def main():
-    p = argparse.ArgumentParser()
-    p.add_argument('--limit', '-l', type=int, default=1, help='Max number of processes')
-    p.add_argument('--command', '-c', type=str, help='Command to execute')
-    # p.add_argument('--timeout', '-t', type=int, default=0, help='Timeout for single process')
-    p.add_argument('--no-shell', default=False, action='store_true', help='Run command through shell')
-    p.add_argument('--exit-code', type=int, default=1, help='Exit code on exceeded limit')
-
-    args = p.parse_args()
-
-    # if args.timeout <= 0:
-    #     args.timeout = None
-
-    return cli(args)
 
 if __name__ == '__main__':
     main()
