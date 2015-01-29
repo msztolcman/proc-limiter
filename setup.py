@@ -5,7 +5,7 @@ BASE_DIR = path.abspath(path.dirname(__file__))
 
 setup(
     name='proc-limiter',
-    version='0.1.0',
+    version='0.2.0',
     description='limit instances of given process to specified quantity',
     long_description='',
     url='http://github.com/mysz/proc-limiter',
