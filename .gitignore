@@ -1,4 +1,6 @@
 /.idea
 /venv
 /dist
-
+__pycache__/
+build/
+proc_limiter.egg-info/
