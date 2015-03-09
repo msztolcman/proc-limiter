@@ -66,7 +66,8 @@ def main():
     else:
         command = args.command
 
-    with open(str(lock_file_path), 'a+'):
+    with lock_file_path.open('a+'):
+
         cnt = count_descriptors(str(lock_file_path))
         if (cnt - 1) >= args.limit:  # minus current process
             print('Limit of processes is exceeded, exiting', file=sys.stderr)
