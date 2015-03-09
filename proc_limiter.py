@@ -43,6 +43,8 @@ def parse_args(args):
     # p.add_argument('--timeout', '-t', type=int, default=0, help='Timeout for single process')
     p.add_argument('--no-shell', default=False, action='store_true', help='Run command through shell')
     p.add_argument('--exit-code', type=int, default=1, help='Exit code on exceeded limit')
+    p.add_argument('--dir-perms', type=str, default='700', help='Permissions to DB directory')
+    p.add_argument('--file-perms', type=str, default='600', help='Permissions to DB files')
 
     args = p.parse_args(args)
     return args
@@ -51,6 +53,11 @@ def parse_args(args):
 def main():
     args = parse_args(sys.argv[1:])
 
+    if args.no_shell:
+        command = shlex.split(args.command)
+    else:
+        command = args.command
+
     # if args.timeout <= 0:
     #     args.timeout = None
 
@@ -58,15 +65,13 @@ def main():
 
     path = pathlib.Path(tempfile.gettempdir()) / DB_NAME
     if not path.exists():
-        path.mkdir(0o700)
+        path.mkdir(int(args.dir_perms, 8))
+    else:
+        os.chmod(str(path), int(args.dir_perms, 8))
     lock_file_path = path / lock_file_name
 
-    if args.no_shell:
-        command = shlex.split(args.command)
-    else:
-        command = args.command
-
     with lock_file_path.open('a+'):
+        os.chmod(str(lock_file_path), int(args.file_perms, 8))
 
         cnt = count_descriptors(str(lock_file_path))
         if (cnt - 1) >= args.limit:  # minus current process
