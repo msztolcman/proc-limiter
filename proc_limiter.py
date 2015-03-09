@@ -2,8 +2,10 @@
 
 import argparse
 import hashlib
+import os
 import pathlib
 import shlex
+import stat
 import subprocess
 import tempfile
 import sys
