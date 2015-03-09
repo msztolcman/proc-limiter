@@ -15,7 +15,14 @@ __version__ = '0.2.0'
 
 
 DB_NAME = 'proc-limiter'
+DEBUG = False
 
+
+def debug(name, *a):
+    if not DEBUG:
+        return
+
+    print('DEBUG:', name, *a)
 
 def get_file_name(cmd):
     hash = hashlib.sha256(cmd).hexdigest()
@@ -47,8 +54,13 @@ def parse_args(args):
     p.add_argument('--exit-code', type=int, default=1, help='Exit code on exceeded limit')
     p.add_argument('--dir-perms', type=str, default='700', help='Permissions to DB directory')
     p.add_argument('--file-perms', type=str, default='600', help='Permissions to DB files')
+    p.add_argument('--debug', action='store_true', help='')
 
     args = p.parse_args(args)
+    if args.debug:
+        global DEBUG
+        DEBUG = True
+
     return args
 
 
@@ -65,12 +77,16 @@ def main():
 
     lock_file_name = get_file_name(str(args.command).encode())
 
-    path = pathlib.Path(tempfile.gettempdir()) / DB_NAME
+    tmp_dir = tempfile.gettempdir()
+    debug('tmp_dir', tmp_dir)
+
+    path = pathlib.Path(tmp_dir) / DB_NAME
     if not path.exists():
         path.mkdir(int(args.dir_perms, 8))
     else:
         os.chmod(str(path), int(args.dir_perms, 8))
     lock_file_path = path / lock_file_name
+    debug('lock_file_path', lock_file_path)
 
     with lock_file_path.open('a+'):
         os.chmod(str(lock_file_path), int(args.file_perms, 8))
