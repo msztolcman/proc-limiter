@@ -48,7 +48,7 @@ def count_descriptors(path):
 def parse_args(args):
     p = argparse.ArgumentParser()
     p.add_argument('--limit', '-l', type=int, default=1, help='Max number of processes')
-    p.add_argument('--command', '-c', type=str, help='Command to execute')
+    p.add_argument('--command', '-c', type=str, required=True, help='Command to execute')
     # p.add_argument('--timeout', '-t', type=int, default=0, help='Timeout for single process')
     p.add_argument('--no-shell', default=False, action='store_true', help='Run command through shell')
     p.add_argument('--exit-code', type=int, default=1, help='Exit code on exceeded limit')
