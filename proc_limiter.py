@@ -92,15 +92,24 @@ def main():
     debug('tmp_dir', tmp_dir)
 
     path = pathlib.Path(tmp_dir) / DB_NAME
-    if not path.exists():
-        path.mkdir(int(args.dir_perms, 8))
-    else:
-        os.chmod(str(path), int(args.dir_perms, 8))
+    try:
+        path.mkdir(args.dir_perms)
+    except FileExistsError:
+        try:
+            os.chmod(str(path), args.dir_perms)
+        except PermissionError as ex:
+            error("Can't change permissions to %s: %s" % (path, ex))
+    except OSError as ex:
+        error("Can't create directory %s: %s" % (path, ex))
+
     lock_file_path = path / lock_file_name
     debug('lock_file_path', lock_file_path)
 
     with lock_file_path.open('a+'):
-        os.chmod(str(lock_file_path), int(args.file_perms, 8))
+        try:
+            os.chmod(str(lock_file_path), args.file_perms)
+        except PermissionError as ex:
+            error("Can't change permissions to %s: %s" % (lock_file_path, ex))
 
         cnt = count_descriptors(str(lock_file_path))
         if (cnt - 1) >= args.limit:  # minus current process
