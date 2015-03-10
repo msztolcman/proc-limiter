@@ -69,6 +69,9 @@ def parse_args(args):
         global DEBUG
         DEBUG = True
 
+    args.dir_perms = int(args.dir_perms, 8)
+    args.file_perms = int(args.file_perms, 8)
+
     return args
 
 
