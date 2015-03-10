@@ -105,20 +105,23 @@ def main():
     lock_file_path = path / lock_file_name
     debug('lock_file_path', lock_file_path)
 
-    with lock_file_path.open('a+'):
-        try:
-            os.chmod(str(lock_file_path), args.file_perms)
-        except PermissionError as ex:
-            error("Can't change permissions to %s: %s" % (lock_file_path, ex))
+    try:
+        with lock_file_path.open('a+'):
+            try:
+                os.chmod(str(lock_file_path), args.file_perms)
+            except PermissionError as ex:
+                error("Can't change permissions to %s: %s" % (lock_file_path, ex))
 
-        cnt = count_descriptors(str(lock_file_path))
-        if (cnt - 1) >= args.limit:  # minus current process
-            print('Limit of processes is exceeded, exiting', file=sys.stderr)
-            sys.exit(args.exit_code)
+            cnt = count_descriptors(str(lock_file_path))
+            if (cnt - 1) >= args.limit:  # minus current process
+                print('Limit of processes is exceeded, exiting', file=sys.stderr)
+                sys.exit(args.exit_code)
 
-        proc = subprocess.Popen(command, shell=not args.no_shell)
-        # proc.wait(timeout=args.timeout)
-        proc.wait()
+            proc = subprocess.Popen(command, shell=not args.no_shell)
+            # proc.wait(timeout=args.timeout)
+            proc.wait()
+    except OSError as ex:
+        error(str(ex))
 
     sys.exit(proc.returncode)
 
