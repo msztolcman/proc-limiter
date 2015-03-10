@@ -25,6 +25,13 @@ def debug(name, *a):
     print('DEBUG:', name, *a, file=sys.stderr)
 
 
+def error(msg, code=1):
+    print(msg, file=sys.stderr)
+
+    if code > 0:
+        sys.exit(code)
+
+
 def get_file_name(cmd):
     hash = hashlib.sha256(cmd).hexdigest()
     return hash
