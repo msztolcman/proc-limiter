@@ -22,7 +22,8 @@ def debug(name, *a):
     if not DEBUG:
         return
 
-    print('DEBUG:', name, *a)
+    print('DEBUG:', name, *a, file=sys.stderr)
+
 
 def get_file_name(cmd):
     hash = hashlib.sha256(cmd).hexdigest()
